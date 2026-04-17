@@ -1,0 +1,17 @@
+com/hisham/sensorapi/exception/LinkedResourceNotFoundException.class
+com/hisham/sensorapi/model/Room.class
+com/hisham/sensorapi/model/SensorReading.class
+com/hisham/sensorapi/data/DataStore.class
+com/hisham/sensorapi/exception/RoomNotEmptyExceptionMapper.class
+com/hisham/sensorapi/filter/ApiLoggingFilter.class
+com/hisham/sensorapi/exception/SensorUnavailableException.class
+com/hisham/sensorapi/model/Sensor.class
+com/hisham/sensorapi/resource/RoomResource.class
+com/hisham/sensorapi/resource/SensorResource.class
+com/hisham/sensorapi/exception/LinkedResourceNotFoundExceptionMapper.class
+com/hisham/sensorapi/resource/SensorReadingResource.class
+com/hisham/sensorapi/exception/RoomNotEmptyException.class
+com/hisham/sensorapi/application/SensorApplication.class
+com/hisham/sensorapi/resource/DiscoveryResource.class
+com/hisham/sensorapi/exception/SensorUnavailableExceptionMapper.class
+com/hisham/sensorapi/exception/GlobalExceptionMapper.class
