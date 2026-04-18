@@ -1,14 +1,7 @@
 package com.hisham.sensorapi.exception;
 
-/**
- * Thrown when a client tries to create a sensor with a roomId that doesn't exist.
- *
- * We map this to HTTP 422 (Unprocessable Entity) rather than 404 (Not Found).
- * The reason: 404 means "the URL you requested doesn't exist". But here, the
- * URL /sensors is perfectly valid - the problem is that the data inside the
- * request body references a room that doesn't exist. The request was understood,
- * but couldn't be processed due to a broken reference. That's exactly what 422 means.
- */
+// Thrown when a sensor is created with a roomId that doesn't exist in the system
+// Mapped to 422 rather than 404 - the URL is valid, but the referenced resource isn't
 public class LinkedResourceNotFoundException extends RuntimeException {
     private final String resourceType;
     private final String resourceId;

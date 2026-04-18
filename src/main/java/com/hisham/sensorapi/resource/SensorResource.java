@@ -16,14 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * Handles all sensor-related endpoints:
- *
- *   GET    /api/v1/sensors              → list all sensors (optional ?type= filter)
- *   POST   /api/v1/sensors              → register a new sensor
- *   GET    /api/v1/sensors/{id}         → get a specific sensor
- *   PATH   /api/v1/sensors/{id}/readings → sub-resource locator
- */
 @Path("/sensors")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -31,12 +23,7 @@ public class SensorResource {
 
     private final DataStore store = DataStore.getInstance();
 
-    /**
-     * GET /sensors or GET /sensors?type=CO2
-     *
-     * Query parameter filtering is the right approach here because we are
-     * filtering a collection, not navigating to a specific named resource.
-     */
+    // Returns all sensors, optionally filtered by type
     @GET
     public Response getAllSensors(@QueryParam("type") String type) {
         List<Sensor> result = store.getSensors().values().stream()
@@ -46,41 +33,35 @@ public class SensorResource {
         return Response.ok(result).build();
     }
 
-    // POST /sensors - register a new sensor, validating that the room exists first
     @POST
     public Response createSensor(Sensor sensor) {
         if (sensor == null || sensor.getId() == null || sensor.getId().isBlank()) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(Map.of("error", "Sensor id is required (e.g. TEMP-001)."))
+                    .entity(Map.of("error", "Sensor id is needed for example TEMP-001."))
                     .build();
         }
 
-        // Validate that the referenced roomId actually exists
+        // Validate the roomId exists before registering the sensor
         if (!store.getRooms().containsKey(sensor.getRoomId())) {
             throw new LinkedResourceNotFoundException("Room", sensor.getRoomId());
         }
 
-        // Default status to ACTIVE if not provided
         if (sensor.getStatus() == null || sensor.getStatus().isBlank()) {
             sensor.setStatus("ACTIVE");
         }
 
         store.getSensors().put(sensor.getId(), sensor);
 
-        // Also add this sensor's ID to the room's sensorIds list
+        // Keep the room's sensorIds list in sync
         Room room = store.getRooms().get(sensor.getRoomId());
         if (!room.getSensorIds().contains(sensor.getId())) {
             room.getSensorIds().add(sensor.getId());
         }
 
         URI location = UriBuilder.fromUri("/api/v1/sensors/{id}").build(sensor.getId());
-
-        return Response.created(location)
-                .entity(sensor)
-                .build();
+        return Response.created(location).entity(sensor).build();
     }
 
-    // GET /sensors/{id}
     @GET
     @Path("/{id}")
     public Response getSensorById(@PathParam("id") String id) {
@@ -95,12 +76,7 @@ public class SensorResource {
         return Response.ok(sensor).build();
     }
 
-    /**
-     * Sub-resource locator for /sensors/{id}/readings
-     *
-     * No HTTP method annotation here - JAX-RS sees this and knows to delegate
-     * the request to whatever object this method returns (SensorReadingResource).
-     */
+    // Sub-resource locator - no HTTP method annotation means JAX-RS delegates to SensorReadingResource
     @Path("/{id}/readings")
     public SensorReadingResource getReadingsResource(@PathParam("id") String sensorId) {
         Sensor sensor = store.getSensors().get(sensorId);

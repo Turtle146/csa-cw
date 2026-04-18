@@ -1,9 +1,6 @@
 package com.hisham.sensorapi.exception;
 
-/**
- * Thrown when someone tries to delete a room that still has sensors in it.
- * This gets caught by RoomNotEmptyExceptionMapper and returns a 409 Conflict.
- */
+// Thrown when attempting to delete a room that still has sensors assigned to it
 public class RoomNotEmptyException extends RuntimeException {
     private final String roomId;
 

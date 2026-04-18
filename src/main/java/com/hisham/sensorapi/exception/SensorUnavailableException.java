@@ -1,13 +1,7 @@
 package com.hisham.sensorapi.exception;
 
-/**
- * Thrown when someone tries to post a reading to a sensor that is currently
- * in MAINTENANCE mode.
- *
- * We map this to HTTP 403 Forbidden - the client is authenticated and the
- * request is understood, but the server is refusing to allow it based on
- * the current state of the resource.
- */
+// Thrown when a reading is posted to a sensor in MAINTENANCE status
+// Mapped to 403 Forbidden - the request is valid but refused based on sensor state
 public class SensorUnavailableException extends RuntimeException {
     private final String sensorId;
 

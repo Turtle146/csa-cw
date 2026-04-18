@@ -3,21 +3,16 @@ package com.hisham.sensorapi.model;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Represents a physical room in the Smart Campus.
- *
- * Rooms have a String-based ID (e.g. "LIB-301"), a human-readable name,
- * a maximum capacity for safety regulations, and a list of sensor IDs
- * representing the sensors deployed in that room.
- */
+
+
 public class Room {
 
-    private String id;           // e.g. "LIB-301"
-    private String name;         // e.g. "Library Quiet Study"
-    private int capacity;        // Maximum occupancy
-    private List<String> sensorIds = new ArrayList<>(); // IDs of sensors in this room
+    private String id;           //  the id of the room "LIB-301"
+    private String name;         // the rooms name "Library Quiet Study"
+    private int capacity;        // the max number of people
+    private List<String> sensorIds = new ArrayList<>(); // array of the sensors in the room
 
-    // Jackson needs a no-argument constructor to deserialise incoming JSON
+    // used so Jackson can turn incoming JSON into a Sensor object
     public Room() {}
 
     public Room(String id, String name, int capacity) {

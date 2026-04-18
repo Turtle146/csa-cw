@@ -5,28 +5,16 @@ import com.hisham.sensorapi.model.Sensor;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * In-memory data store for the entire application.
- *
- * Uses ConcurrentHashMap for thread safety - multiple requests can arrive
- * simultaneously and a regular HashMap would corrupt data under concurrent
- * writes. ConcurrentHashMap handles this safely without locking the whole map.
- *
- * IDs are now Strings (e.g. "LIB-301", "TEMP-001") supplied by the client,
- * so we no longer need AtomicInteger counters.
- *
- * This is a singleton - one shared instance across the whole application.
- */
 public class DataStore {
 
-    private static final DataStore INSTANCE = new DataStore();
+    private static final DataStore INSTANCE = new DataStore(); // only one instance exists across the whole app
 
-    private final ConcurrentHashMap<String, Room> rooms = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, Sensor> sensors = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Room> rooms = new ConcurrentHashMap<>(); // stores all rooms, keyed by their ID
+    private final ConcurrentHashMap<String, Sensor> sensors = new ConcurrentHashMap<>(); // stores all sensors, keyed by their ID
 
-    private DataStore() {}
+    private DataStore() {} // private so nobody can create a second instance
 
-    public static DataStore getInstance() {
+    public static DataStore getInstance() { // how other classes get access to the store
         return INSTANCE;
     }
 

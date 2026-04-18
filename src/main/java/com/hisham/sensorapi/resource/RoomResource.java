@@ -14,30 +14,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Handles all room-related endpoints:
- *
- *   GET    /api/v1/rooms          → list all rooms
- *   POST   /api/v1/rooms          → create a new room
- *   GET    /api/v1/rooms/{id}     → get a specific room by ID
- *   DELETE /api/v1/rooms/{id}     → delete a room (fails if it has sensors)
- */
-@Path("/rooms")
+@Path("/rooms") // all endpoints in this class live under /api/v1/rooms
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class RoomResource {
 
-    private final DataStore store = DataStore.getInstance();
+    private final DataStore store = DataStore.getInstance(); // access to our in-memory data
 
-    // GET /rooms - return all rooms as a list
-    @GET
+    @GET // GET /rooms - returns every room we have stored
     public Response getAllRooms() {
         List<Room> roomList = new ArrayList<>(store.getRooms().values());
         return Response.ok(roomList).build();
     }
 
-    // POST /rooms - create a new room
-    @POST
+    @POST // POST /rooms - creates a new room
     public Response createRoom(Room room) {
         if (room == null || room.getId() == null || room.getId().isBlank()) {
             return Response.status(Response.Status.BAD_REQUEST)
@@ -45,7 +35,7 @@ public class RoomResource {
                     .build();
         }
 
-        if (store.getRooms().containsKey(room.getId())) {
+        if (store.getRooms().containsKey(room.getId())) { // stop duplicate ids
             return Response.status(Response.Status.CONFLICT)
                     .entity(Map.of("error", "A room with ID " + room.getId() + " already exists."))
                     .build();
@@ -53,16 +43,12 @@ public class RoomResource {
 
         store.getRooms().put(room.getId(), room);
 
-        URI location = UriBuilder.fromUri("/api/v1/rooms/{id}").build(room.getId());
-
-        return Response.created(location)
-                .entity(room)
-                .build();
+        URI location = UriBuilder.fromUri("/api/v1/rooms/{id}").build(room.getId()); // location header pointing to the new room
+        return Response.created(location).entity(room).build(); // 201 Created
     }
 
-    // GET /rooms/{id} - get a specific room
     @GET
-    @Path("/{id}")
+    @Path("/{id}") // GET /rooms/{id} this will fetch one specific room
     public Response getRoomById(@PathParam("id") String id) {
         Room room = store.getRooms().get(id);
 
@@ -75,9 +61,8 @@ public class RoomResource {
         return Response.ok(room).build();
     }
 
-    // DELETE /rooms/{id} - delete a room, only if it has no sensors
     @DELETE
-    @Path("/{id}")
+    @Path("/{id}") // DELETE /rooms/{id} this will remove the room but only if it has no sensors
     public Response deleteRoom(@PathParam("id") String id) {
         Room room = store.getRooms().get(id);
 
@@ -87,16 +72,15 @@ public class RoomResource {
                     .build();
         }
 
-        // Check if any sensors are still assigned to this room
+        // blocks the deletion if any sensors are still linked to this room
         boolean hasSensors = store.getSensors().values().stream()
                 .anyMatch(sensor -> id.equals(sensor.getRoomId()));
 
         if (hasSensors) {
-            throw new RoomNotEmptyException(id);
+            throw new RoomNotEmptyException(id); // triggers 409 Conflict
         }
 
         store.getRooms().remove(id);
-
-        return Response.noContent().build(); // 204 No Content
+        return Response.noContent().build(); // 204 No Content - deleted successfully
     }
 }

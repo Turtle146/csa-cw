@@ -2,22 +2,14 @@ package com.hisham.sensorapi.model;
 
 import java.util.UUID;
 
-/**
- * Represents a single reading recorded by a sensor.
- *
- * Each reading has a UUID-based ID, an epoch timestamp (milliseconds since
- * 1970) recording exactly when the reading was captured, and the actual
- * measured value.
- *
- * When a new reading is POSTed, the parent sensor's currentValue is
- * automatically updated to match.
- */
+
 public class SensorReading {
 
-    private String id;        // UUID e.g. "a3f1c2d4-..."
-    private long timestamp;   // Epoch time in ms
-    private double value;     // The measured value
+    private String id;        // every reading has an auto generated id like "c3b1a2d4-..."
+    private long timestamp;   //  stores a timestamp in ms for every reading
+    private double value;     //  the actual measured value
 
+    // used so Jackson can turn incoming JSON into a SensorReading object
     public SensorReading() {}
 
     public SensorReading(double value) {

@@ -16,51 +16,32 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-/**
- * Sub-resource for managing readings under a specific sensor.
- * Handles: /api/v1/sensors/{sensorId}/readings
- *
- * This class is not annotated with @Path at the class level - it is
- * instantiated and returned by SensorResource's sub-resource locator method.
- * JAX-RS then calls the appropriate @GET or @POST method on this object.
- */
+// handles all reading endpoints under /api/v1/sensors/{sensorId}/readings
+// this class is not registered directly - it gets returned by SensorResource's sub-resource locator
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class SensorReadingResource {
 
-    private final Sensor sensor;
+    private final Sensor sensor; // the sensor this reading belongs to
     private final DataStore store = DataStore.getInstance();
 
-    // Reading history stored per sensor ID - shared across all instances
     private static final ConcurrentHashMap<String, CopyOnWriteArrayList<SensorReading>> readingsStore
-            = new ConcurrentHashMap<>();
+            = new ConcurrentHashMap<>(); // stores reading history per sensor ID
 
     public SensorReadingResource(Sensor sensor) {
         this.sensor = sensor;
     }
 
-    /**
-     * GET /sensors/{id}/readings
-     * Returns the full reading history for this sensor.
-     */
-    @GET
+    @GET // GET /sensors/{id}/readings  this returns all readings for this sensor
     public Response getReadings() {
         List<SensorReading> history = readingsStore.getOrDefault(sensor.getId(), new CopyOnWriteArrayList<>());
         return Response.ok(history).build();
     }
 
-    /**
-     * POST /sensors/{id}/readings
-     * Records a new reading for this sensor.
-     *
-     * Blocked if sensor status is MAINTENANCE (throws 403).
-     * On success, also updates the parent sensor's currentValue.
-     */
-    @POST
+    @POST // POST /sensors/{id}/readings this records a new reading
     public Response addReading(SensorReading incoming) {
-        // Block readings for sensors under maintenance
         if ("MAINTENANCE".equalsIgnoreCase(sensor.getStatus())) {
-            throw new SensorUnavailableException(sensor.getId());
+            throw new SensorUnavailableException(sensor.getId()); // triggers 403 Forbidden
         }
 
         if (incoming == null) {
@@ -69,22 +50,18 @@ public class SensorReadingResource {
                     .build();
         }
 
-        // Create the persisted reading with auto-generated UUID and timestamp
-        SensorReading newReading = new SensorReading(incoming.getValue());
+        SensorReading newReading = new SensorReading(incoming.getValue()); // auto generates the id and timestamp
 
-        // Store it in the readings history
         readingsStore.computeIfAbsent(sensor.getId(), k -> new CopyOnWriteArrayList<>())
-                     .add(newReading);
+                .add(newReading); // adds to this sensors reading history
 
-        // Update the parent sensor's currentValue - key side effect!
+        // update the parent sensors current value to reflect the latest reading
         sensor.setCurrentValue(incoming.getValue());
         store.getSensors().put(sensor.getId(), sensor);
 
         URI location = UriBuilder.fromUri("/api/v1/sensors/{sensorId}/readings/{readingId}")
                 .build(sensor.getId(), newReading.getId());
 
-        return Response.created(location)
-                .entity(newReading)
-                .build();
+        return Response.created(location).entity(newReading).build(); // 201 Created
     }
 }
