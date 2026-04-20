@@ -24,7 +24,7 @@ A JAX-RS REST API built with Jersey and Maven for managing rooms and sensors acr
    ```
    $TOMCAT_HOME/bin/startup.sh
    ```
-6. The API is available at: `http://localhost:8080/api/v1`
+6. The API is available at: `http://localhost:8080/sensor-api/api/v1`
 
 ---
 
@@ -32,48 +32,48 @@ A JAX-RS REST API built with Jersey and Maven for managing rooms and sensors acr
 
 ### 1. Discovery endpoint
 ```bash
-curl http://localhost:8080/api/v1
+curl http://localhost:8080/sensor-api/api/v1
 ```
 
 ### 2. Create a room
 ```bash
-curl -X POST http://localhost:8080/api/v1/rooms \
+curl -X POST http://localhost:8080/sensor-api/api/v1/rooms \
   -H "Content-Type: application/json" \
   -d '{"id":"LIB-301","name":"Library Quiet Study","capacity":50}'
 ```
 
 ### 3. Create a sensor (linked to the room above)
 ```bash
-curl -X POST http://localhost:8080/api/v1/sensors \
+curl -X POST http://localhost:8080/sensor-api/api/v1/sensors \
   -H "Content-Type: application/json" \
   -d '{"id":"TEMP-001","type":"Temperature","status":"ACTIVE","currentValue":0.0,"roomId":"LIB-301"}'
 ```
 
 ### 4. Filter sensors by type
 ```bash
-curl "http://localhost:8080/api/v1/sensors?type=Temperature"
+curl "http://localhost:8080/sensor-api/api/v1/sensors?type=Temperature"
 ```
 
 ### 5. Post a reading to a sensor
 ```bash
-curl -X POST http://localhost:8080/api/v1/sensors/TEMP-001/readings \
+curl -X POST http://localhost:8080/sensor-api/api/v1/sensors/TEMP-001/readings \
   -H "Content-Type: application/json" \
   -d '{"value":22.5}'
 ```
 
 ### 6. Get reading history for a sensor
 ```bash
-curl http://localhost:8080/api/v1/sensors/TEMP-001/readings
+curl http://localhost:8080/sensor-api/api/v1/sensors/TEMP-001/readings
 ```
 
 ### 7. Try to delete a room that has sensors (expect 409)
 ```bash
-curl -X DELETE http://localhost:8080/api/v1/rooms/LIB-301
+curl -X DELETE http://localhost:8080/sensor-api/api/v1/rooms/LIB-301
 ```
 
 ### 8. Try to create a sensor with a non-existent roomId (expect 422)
 ```bash
-curl -X POST http://localhost:8080/api/v1/sensors \
+curl -X POST http://localhost:8080/sensor-api/api/v1/sensors \
   -H "Content-Type: application/json" \
   -d '{"id":"CO2-999","type":"CO2","roomId":"FAKE-999"}'
 ```

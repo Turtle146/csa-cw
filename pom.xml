@@ -24,14 +24,14 @@
             <version>3.1.3</version>
         </dependency>
 
-        <!-- Jersey JSON support via Jackson -->
+        <!-- Jersey JSON support through Jackson -->
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-jackson</artifactId>
             <version>3.1.3</version>
         </dependency>
 
-        <!-- Needed for Jersey to auto-discover features -->
+        <!-- for Jersey to auto-discover features -->
         <dependency>
             <groupId>org.glassfish.jersey.inject</groupId>
             <artifactId>jersey-hk2</artifactId>
@@ -45,6 +45,13 @@
             <version>6.0.0</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- Jackson JAXB annotations support -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-jaxb-annotations</artifactId>
+            <version>2.15.2</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -55,7 +62,6 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.3.2</version>
                 <configuration>
-                    <!-- No web.xml needed - we use annotations -->
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>
